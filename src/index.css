@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100vh;
+  @apply bg-black font-extralight;
+}
+
+#root {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  grid-template-rows: theme(spacing.20) 1fr;
+
+  @apply text-white;
+}
+
+.markdown-body {
+  font-weight: normal;
+}
