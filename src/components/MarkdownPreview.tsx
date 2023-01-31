@@ -6,7 +6,11 @@ import { fillTemplate, TemplateData } from "../template";
 type Props = { data: TemplateData };
 
 export function MarkdownPreview({ data }: Props) {
-  const [converter] = useState(() => new Converter());
+  const [converter] = useState(() => {
+    const converter = new Converter();
+    converter.setFlavor("github");
+    return converter;
+  });
 
   const { description, screenshotUrls, tagline, title, websiteUrl, logoUrl } =
     data;
