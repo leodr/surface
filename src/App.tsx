@@ -2,7 +2,9 @@ import { Dialog } from "@headlessui/react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { MarkdownPreview } from "./components/MarkdownPreview";
 import { TextInput } from "./components/TextInput";
+import { defaultTemplate } from "./default-template";
 import { importGithubRepository } from "./repo-import";
+import { fillTemplate } from "./template";
 
 function App() {
   const [title, setTitle] = useState(appNameExample);
@@ -37,6 +39,21 @@ function App() {
     const screenshots = event.target.files;
 
     setScreenshotFiles(screenshots);
+  }
+
+  function handleCopyMarkdown() {
+    const markdown = fillTemplate(defaultTemplate, {
+      title,
+      description,
+      screenshotUrls: screenshotUrls.map(
+        (_, i) => `./readme-assets/screenshot-${i + 1}.png`
+      ),
+      tagline,
+      websiteUrl,
+      logoUrl: "./readme-assets/logo.png",
+    });
+
+    navigator.clipboard.writeText(markdown);
   }
 
   const [logoUrl, setLogoUrl] = useState<string>();
@@ -172,18 +189,24 @@ function App() {
           </label>
         </form>
       </div>
-      <div className="bg-white flex-1 p-4 overflow-y-auto relative">
-        <MarkdownPreview
-          data={{
-            title,
-            description,
-            screenshotUrls,
-            tagline,
-            websiteUrl,
-            logoUrl,
-          }}
-        />
-        <button className="bg-gray-900 flex items-center gap-3 px-6 py-4 rounded-full absolute bottom-10 right-10 shadow-lg">
+      <div className="flex-1 bg-white relative min-h-0">
+        <div className="p-4 overflow-y-auto max-h-full">
+          <MarkdownPreview
+            data={{
+              title,
+              description,
+              screenshotUrls,
+              tagline,
+              websiteUrl,
+              logoUrl,
+            }}
+            theme="light"
+          />
+        </div>
+        <button
+          className="bg-gray-900 flex items-center gap-3 px-6 py-4 rounded-full absolute bottom-10 right-10 shadow-lg"
+          onClick={handleCopyMarkdown}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"

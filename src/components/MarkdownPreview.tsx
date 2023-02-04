@@ -1,11 +1,15 @@
+import darkCss from "github-markdown-css/github-markdown-dark.css?raw";
+import lightCss from "github-markdown-css/github-markdown-light.css?raw";
 import { useMemo, useState } from "react";
 import { Converter } from "showdown";
 import { defaultTemplate } from "../default-template";
 import { fillTemplate, TemplateData } from "../template";
 
-type Props = { data: TemplateData };
+export type Theme = "light" | "dark";
 
-export function MarkdownPreview({ data }: Props) {
+type Props = { data: TemplateData; theme: Theme };
+
+export function MarkdownPreview({ data, theme }: Props) {
   const [converter] = useState(() => {
     const converter = new Converter();
     converter.setFlavor("github");
@@ -35,6 +39,11 @@ export function MarkdownPreview({ data }: Props) {
 
   return (
     <article className="markdown-body mx-auto max-w-[80ch]">
+      <style
+        dangerouslySetInnerHTML={{
+          __html: theme === "dark" ? darkCss : lightCss,
+        }}
+      ></style>
       <div dangerouslySetInnerHTML={{ __html: html }} />
     </article>
   );
