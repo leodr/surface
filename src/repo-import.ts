@@ -35,7 +35,7 @@ export async function importGithubRepository({
     `https://raw.githubusercontent.com/${owner}/${repository}/${defaultBranch}/README.md`
   );
 
-  const description = "";
+  let description = "";
 
   if (readmeResponse.ok) {
     const readme = await readmeResponse.text();
@@ -44,8 +44,6 @@ export async function importGithubRepository({
       .map((e) => e.trim())
       .filter(Boolean)
       .map((e) => replaceSingleNewlines(e));
-
-    let description = "";
 
     for (const string of readmeSections) {
       if (string.length > description.length) description = string;

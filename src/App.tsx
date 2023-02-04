@@ -1,8 +1,9 @@
 import { Dialog } from "@headlessui/react";
+import { ImageIcon } from "@radix-ui/react-icons";
 import { ChangeEvent, useEffect, useState } from "react";
-import { MarkdownPreview, Theme } from "./components/MarkdownPreview";
+import { MarkdownPreview } from "./components/MarkdownPreview";
 import { TextInput } from "./components/TextInput";
-import { ThemeToggle } from "./components/ThemeToggle";
+import { Theme, ThemeToggle } from "./components/ThemeToggle";
 import { defaultTemplate } from "./default-template";
 import { importGithubRepository } from "./repo-import";
 import { fillTemplate } from "./template";
@@ -18,20 +19,11 @@ function App() {
 
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
-  const [githubImportUrl, setGithubImportUrl] = useState("");
+  const [githubImportUrl, setGithubImportUrl] = useState(
+    "https://github.com/leodr/surface"
+  );
 
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    importGithubRepository({ owner: "leodr", repository: "formulary" }).then(
-      ({ description, tagline, title, websiteUrl }) => {
-        if (title) setTitle(title);
-        if (description) setDescription(description);
-        if (tagline) setTagline(tagline);
-        if (websiteUrl) setWebsiteUrl(websiteUrl);
-      }
-    );
-  }, []);
+  const [theme, setTheme] = useState<Theme>(getThemeFromMediaQuery);
 
   function handleLogoChange(event: ChangeEvent<HTMLInputElement>) {
     const logo = event.target.files?.[0];
@@ -42,6 +34,23 @@ function App() {
     const screenshots = event.target.files;
 
     setScreenshotFiles(screenshots);
+  }
+
+  function handleImport() {
+    setImportDialogOpen(false);
+
+    const info = getRepoAndOwnerFromGithubUrl(githubImportUrl);
+
+    if (info) {
+      importGithubRepository(info).then(
+        ({ description, tagline, title, websiteUrl }) => {
+          if (title) setTitle(title);
+          if (description) setDescription(description);
+          if (tagline) setTagline(tagline);
+          if (websiteUrl) setWebsiteUrl(websiteUrl);
+        }
+      );
+    }
   }
 
   function handleCopyMarkdown() {
@@ -141,16 +150,21 @@ function App() {
       <div className="flex-1 bg-black text-white overflow-y-auto p-8">
         <h1 className="mb-8 text-4xl">Surface</h1>
         <form className="flex flex-col gap-8">
-          <label className="flex flex-col gap-2" htmlFor="logo">
+          <label className="flex flex-col gap-2 self-start" htmlFor="logo">
             <span className="uppercase text-gray-300 text-sm tracking-wide">
               Logo
             </span>
             <input
               onChange={handleLogoChange}
-              className="w-full"
+              className="sr-only"
               type="file"
-              name="logo"
+              accept="image/*"
+              id="logo"
             />
+            <div className="bg-gray-900 flex items-center gap-2 px-4 py-3 rounded-sm w-fit">
+              <ImageIcon />
+              <span>Choose...</span>
+            </div>
           </label>
           <TextInput
             label="Title"
@@ -186,11 +200,17 @@ function App() {
               Screenshots
             </span>
             <input
+              className="sr-only"
               onChange={handleScreenshotsChange}
               type="file"
-              name="screenshots"
+              accept="image/*"
+              id="screenshots"
               multiple
             />
+            <div className="bg-gray-900 flex items-center gap-2 px-4 py-3 rounded-sm w-fit">
+              <ImageIcon />
+              <span>Choose...</span>
+            </div>
           </label>
         </form>
       </div>
@@ -213,7 +233,7 @@ function App() {
           />
         </div>
         <button
-          className="bg-gray-900 flex items-center gap-3 px-6 py-4 rounded-full absolute bottom-10 right-10 shadow-lg"
+          className="bg-gray-900 flex items-center gap-3 px-6 py-4 rounded-full absolute bottom-10 right-10 border-2 border-white"
           onClick={handleCopyMarkdown}
         >
           <svg
@@ -244,26 +264,43 @@ function App() {
             <Dialog.Title className="text-white text-2xl">
               Import GitHub Repository
             </Dialog.Title>
-            <Dialog.Description>
-              <TextInput
-                label="GitHub Repository URL"
-                value={githubImportUrl}
-                onChange={setGithubImportUrl}
-                id="github-import-url"
-                placeholder="https://github.com/leodr/surface"
-              />
-            </Dialog.Description>
-            <p>
-              Are you sure you want to deactivate your account? All of your data
-              will be permanently removed. This action cannot be undone.
-            </p>
-            <button onClick={() => setImportDialogOpen(false)}>Import</button>
+            <TextInput
+              label="GitHub Repository URL"
+              value={githubImportUrl}
+              onChange={setGithubImportUrl}
+              id="github-import-url"
+              placeholder="https://github.com/leodr/surface"
+            />
+            <button onClick={handleImport}>Import</button>
             <button onClick={() => setImportDialogOpen(false)}>Cancel</button>
           </Dialog.Panel>
         </div>
       </Dialog>
     </>
   );
+}
+
+function getThemeFromMediaQuery(): Theme {
+  const shouldUseDarkMode = window.matchMedia(
+    "(prefers-color-scheme: dark)"
+  ).matches;
+
+  return shouldUseDarkMode ? "dark" : "light";
+}
+
+function getRepoAndOwnerFromGithubUrl(url: string) {
+  const regex = /(?:https:\/\/)(?:www\.)?github\.com\/(.+?)\/(.+)?/;
+
+  const match = url.match(regex);
+
+  if (match && match[1] && match[2]) {
+    return {
+      owner: match[1],
+      repository: match[2],
+    };
+  }
+
+  return null;
 }
 
 const appNameExamples = [
