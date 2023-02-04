@@ -1,7 +1,8 @@
 import { Dialog } from "@headlessui/react";
 import { ChangeEvent, useEffect, useState } from "react";
-import { MarkdownPreview } from "./components/MarkdownPreview";
+import { MarkdownPreview, Theme } from "./components/MarkdownPreview";
 import { TextInput } from "./components/TextInput";
+import { ThemeToggle } from "./components/ThemeToggle";
 import { defaultTemplate } from "./default-template";
 import { importGithubRepository } from "./repo-import";
 import { fillTemplate } from "./template";
@@ -18,6 +19,8 @@ function App() {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const [githubImportUrl, setGithubImportUrl] = useState("");
+
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
     importGithubRepository({ owner: "leodr", repository: "formulary" }).then(
@@ -132,7 +135,9 @@ function App() {
           <span>Clear</span>
         </button>
       </div>
-      <div className="border-b border-white">world</div>
+      <div className="border-b border-white flex items-center justify-center">
+        <ThemeToggle theme={theme} onThemeChange={setTheme} />
+      </div>
       <div className="flex-1 bg-black text-white overflow-y-auto p-8">
         <h1 className="mb-8 text-4xl">Surface</h1>
         <form className="flex flex-col gap-8">
@@ -189,8 +194,12 @@ function App() {
           </label>
         </form>
       </div>
-      <div className="flex-1 bg-white relative min-h-0">
-        <div className="p-4 overflow-y-auto max-h-full">
+      <div
+        className={`flex-1 relative min-h-0 ${
+          theme === "dark" ? "bg-[#0d1117]" : "bg-white"
+        }`}
+      >
+        <div className="p-4 overflow-y-auto max-h-full flex justify-center">
           <MarkdownPreview
             data={{
               title,
@@ -200,7 +209,7 @@ function App() {
               websiteUrl,
               logoUrl,
             }}
-            theme="light"
+            theme={theme}
           />
         </div>
         <button

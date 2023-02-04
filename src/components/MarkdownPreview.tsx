@@ -4,8 +4,7 @@ import { useMemo, useState } from "react";
 import { Converter } from "showdown";
 import { defaultTemplate } from "../default-template";
 import { fillTemplate, TemplateData } from "../template";
-
-export type Theme = "light" | "dark";
+import { Theme } from "./ThemeToggle";
 
 type Props = { data: TemplateData; theme: Theme };
 
