@@ -2,7 +2,6 @@ import darkCss from "github-markdown-css/github-markdown-dark.css?raw";
 import lightCss from "github-markdown-css/github-markdown-light.css?raw";
 import { useMemo, useState } from "react";
 import { Converter } from "showdown";
-import { defaultTemplate } from "../default-template";
 import { fillTemplate, TemplateData } from "../template";
 import { Theme } from "./ThemeToggle";
 
@@ -20,7 +19,7 @@ export function MarkdownPreview({ data, theme }: Props) {
 
   const markdown = useMemo(
     () =>
-      fillTemplate(defaultTemplate, {
+      fillTemplate({
         title,
         tagline,
         websiteUrl,

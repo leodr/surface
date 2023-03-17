@@ -4,9 +4,11 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { MarkdownPreview } from "./components/MarkdownPreview";
 import { TextInput } from "./components/TextInput";
 import { Theme, ThemeToggle } from "./components/ThemeToggle";
-import { defaultTemplate } from "./default-template";
+import { format } from "./prettier/format";
 import { importGithubRepository } from "./repo-import";
 import { fillTemplate } from "./template";
+
+format("console.log( 'hello world'");
 
 function App() {
   const [title, setTitle] = useState(appNameExample);
@@ -54,7 +56,7 @@ function App() {
   }
 
   function handleCopyMarkdown() {
-    const markdown = fillTemplate(defaultTemplate, {
+    const markdown = fillTemplate({
       title,
       description,
       screenshotUrls: screenshotUrls.map(
